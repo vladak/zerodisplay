@@ -4,10 +4,14 @@
 Display weather metrics on ePaper.
 """
 
+import argparse
 import time
 import requests
+import logging
 
 from datetime import datetime
+
+from logutil import LogLevelAction
 
 import digitalio
 import busio
@@ -62,9 +66,11 @@ def get_metrics(url):
     co2 = None
     pressure = None
 
+    logger = logging.getLogger(__name__)
+
     r = requests.get(url)
     if r.status_code != 200:
-        print(f"cannot retrieve metrics from {url}: {r.status_code}")
+        logger.error(f"cannot retrieve metrics from {url}: {r.status_code}")
     else:
         lines = r.text.split("\n")
         for line in lines:
@@ -83,8 +89,10 @@ def get_metrics(url):
     return temp, co2, pressure
 
 
-def update_display():
-    temp, co2, pressure = get_metrics("http://weather:8111")
+def update_display(url):
+    logger = logging.getLogger(__name__)
+
+    temp, co2, pressure = get_metrics(url)
 
     image = Image.new("RGB", (display.width, display.height))
 
@@ -97,10 +105,10 @@ def update_display():
     # Display time
     now = datetime.now()
     text = now.strftime("%H:%M").lstrip("0").replace(" 0", " ")
-    print(text)
+    logger.debug(text)
     (text_width, text_height) = medium_font.getsize(text)
     coords = (display.width - text_width - 10, 0)
-    print(f"coordinates = {coords}")
+    logger.debug(f"coordinates = {coords}")
     draw.text(
         coords,
         text,
@@ -114,13 +122,13 @@ def update_display():
         text = f"{outside_temp}°C"
     else:
         text = "N/A"
-    print(text)
+    logger.debug(text)
     (text_width, text_height) = large_font.getsize(text)
-    print(f"text width={text_width}, height={text_height}")
-    print(f"display width={display.width}, height={display.height}")
+    logger.debug(f"text width={text_width}, height={text_height}")
+    logger.debug(f"display width={display.width}, height={display.height}")
     # coords = (display.width // 2 - text_width // 2, display.height // 2 - text_height // 2)
     coords = (0, 0)
-    print(f"coordinates = {coords}")
+    logger.debug(f"coordinates = {coords}")
     draw.text(
         coords,
         text,
@@ -134,12 +142,12 @@ def update_display():
         text = f"CO2: {co2} ppm"
     else:
         text = "CO2: N/A"
-    print(text)
+    logger.debug(text)
     coords = (0, text_height + 10)  # use previous text height
     y = text_height + 10
-    (text_width, text_height) = font.getsize(text)
+    (text_width, text_height) = medium_font.getsize(text)
     y = y + text_height
-    print(f"coordinates = {coords}")
+    logger.debug(f"coordinates = {coords}")
     draw.text(
         coords,
         text,
@@ -153,9 +161,9 @@ def update_display():
         text = f"Pressure: {pressure} hPa"
     else:
         text = "Pressure: N/A"
-    print(text)
+    logger.debug(text)
     coords = (0, y)  # use previous text height
-    print(f"coordinates = {coords}")
+    logger.debug(f"coordinates = {coords}")
     draw.text(
         coords,
         text,
@@ -164,14 +172,54 @@ def update_display():
     )
 
     # Display image.
-    print("display in progress")
+    logger.debug("display in progress")
     display.image(image)
     display.display()
-    print("display done")
+    logger.debug("display done")
+
+
+def parse_args():
+    """
+    Parse command line arguments
+    """
+
+    parser = argparse.ArgumentParser(
+        description="Update eInk paper display with weather metrics",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument(
+        "-l",
+        "--loglevel",
+        action=LogLevelAction,
+        help='Set log level (e.g. "ERROR")',
+        default=logging.INFO,
+    )
+    parser.add_argument(
+        "-t",
+        "--timeout",
+        help="Timeout in seconds to sleep between updating the display",
+        default=120,
+    )
+    parser.add_argument(
+        "--url",
+        help="URL to query for metrics in Prometheus format",
+        default="http://weather:8111",
+    )
+
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+
+    logging.basicConfig()
+    logger = logging.getLogger(__name__)
+    logger.setLevel(args.loglevel)
+
+    while True:
+        update_display(args.url)
+        time.sleep(args.timeout)
 
 
 if __name__ == "__main__":
-    # TODO: argparse
-    while True:
-        update_display()
-        time.sleep(120)
+    main()

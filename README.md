@@ -13,16 +13,19 @@ sudo raspi-config
 - check there are some `/dev/spidev0.*` devices
 - install pre-requisites
 ```
-  sudo apt-get install -y python3-pip
+  sudo apt-get install -y python3-venv
   sudo apt-get install -y fonts-dejavu
 ```
 - checkout the Git repository
 ```
-  mkdir /srv
+  [[ ! -d srv ]] || mkdir /srv
+  sudo chown pi /srv
+  sudo apt-get install -y git
   git clone https://github.com/vladak/zerodisplay /srv/zerodisplay
 ```
 - install requirements:
 ```
+  cd /srv/zerodisplay
   python3 -m venv env
   . ./env/bin/activate
   pip install -r requirements.txt

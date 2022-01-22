@@ -48,8 +48,6 @@ display.rotation = 1
 # Load a TTF Font
 font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", FONTSIZE)
 
-# TODO: display current time
-
 small_font = ImageFont.truetype(
     "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 16
 )
@@ -62,7 +60,6 @@ large_font = ImageFont.truetype(
 def update_display():
     r = requests.get("http://weather:8111")
     if r.status_code != 200:
-        # TODO: Draw the error on screen
         print("error")
         sys.exit(1)
 
@@ -120,7 +117,6 @@ def update_display():
     )
 
     # Display CO2 level.
-    # TODO: diplay warning sign if above threshold
     co2 = int(float(co2))
     text = f"CO2: {co2} ppm"
     print(text)

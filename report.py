@@ -212,6 +212,10 @@ def parse_args():
 
 
 def main():
+    """
+    The main function. Parses args and runs infinite loop to update the display.
+    :return:
+    """
     args = parse_args()
 
     logging.basicConfig()

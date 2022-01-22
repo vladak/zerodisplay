@@ -34,7 +34,7 @@ sudo raspi-config
 ```
 - enable+start the service
 ```
-  sudo cp /srv/weather/zerodisplay.service /etc/systemd/system/
+  sudo cp /srv/zerodisplay/zerodisplay.service /etc/systemd/system/
   sudo systemctl enable zerodisplay
   sudo systemctl daemon-reload
   sudo systemctl start zerodisplay

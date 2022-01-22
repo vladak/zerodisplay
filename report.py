@@ -6,7 +6,6 @@ Display weather metrics on ePaper.
 
 import time
 import requests
-import sys
 
 from datetime import datetime
 

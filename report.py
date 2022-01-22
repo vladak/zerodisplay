@@ -13,8 +13,7 @@ import board
 import busio
 import digitalio
 import requests
-from adafruit_epd.ssd1680 import \
-    Adafruit_SSD1680  # pylint: disable=unused-import
+from adafruit_epd.ssd1680 import Adafruit_SSD1680  # pylint: disable=unused-import
 from PIL import Image, ImageDraw, ImageFont
 
 from logutil import LogLevelAction
@@ -35,14 +34,16 @@ dc = digitalio.DigitalInOut(board.D22)
 rst = digitalio.DigitalInOut(board.D27)
 busy = digitalio.DigitalInOut(board.D17)
 
-display = Adafruit_SSD1680(122, 250,  # 2.13" HD Tri-color or mono display
-                           spi,
-                           cs_pin=ecs,
-                           dc_pin=dc,
-                           sramcs_pin=None,
-                           rst_pin=rst,
-                           busy_pin=busy,
-                           )
+display = Adafruit_SSD1680(
+    122,
+    250,  # 2.13" HD Tri-color or mono display
+    spi,
+    cs_pin=ecs,
+    dc_pin=dc,
+    sramcs_pin=None,
+    rst_pin=rst,
+    busy_pin=busy,
+)
 
 display.rotation = 1
 

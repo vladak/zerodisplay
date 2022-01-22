@@ -1,3 +1,5 @@
+[![Python checks](https://github.com/vladak/zerodisplay/actions/workflows/python-checks.yml/badge.svg)](https://github.com/vladak/zerodisplay/actions/workflows/python-checks.yml)
+
 # zerodisplay
 
 ## Install

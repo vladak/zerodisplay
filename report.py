@@ -5,19 +5,19 @@ Display weather metrics on ePaper.
 """
 
 import argparse
-import time
-import requests
 import logging
-
+import time
 from datetime import datetime
 
-from logutil import LogLevelAction
-
-import digitalio
-import busio
 import board
+import busio
+import digitalio
+import requests
+from adafruit_epd.ssd1680 import \
+    Adafruit_SSD1680  # pylint: disable=unused-import
 from PIL import Image, ImageDraw, ImageFont
-from adafruit_epd.ssd1680 import Adafruit_SSD1680  # pylint: disable=unused-import
+
+from logutil import LogLevelAction
 
 # First define some color constants
 WHITE = (0xFF, 0xFF, 0xFF)

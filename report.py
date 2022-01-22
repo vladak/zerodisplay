@@ -13,7 +13,7 @@ import board
 import busio
 import digitalio
 import requests
-from adafruit_epd.ssd1680 import Adafruit_SSD1680  # pylint: disable=unused-import
+from adafruit_epd.ssd1680 import Adafruit_SSD1680
 from PIL import Image, ImageDraw, ImageFont
 
 from logutil import LogLevelAction

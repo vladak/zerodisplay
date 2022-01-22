@@ -90,6 +90,10 @@ def get_metrics(url):
 
 
 def update_display(url):
+    """
+    Refresh the display with weather metrics retrieved from the URL
+    :param url: URL to retrieve the metrics from
+    """
     logger = logging.getLogger(__name__)
 
     temp, co2, pressure = get_metrics(url)

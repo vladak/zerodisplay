@@ -34,14 +34,14 @@ srcs = None
 rst = digitalio.DigitalInOut(board.D27)
 busy = digitalio.DigitalInOut(board.D17)
 
-display = Adafruit_SSD1680(122, 250,        # 2.13" HD Tri-color or mono display
-    spi,
-    cs_pin=ecs,
-    dc_pin=dc,
-    sramcs_pin=srcs,
-    rst_pin=rst,
-    busy_pin=busy,
-)
+display = Adafruit_SSD1680(122, 250,  # 2.13" HD Tri-color or mono display
+                           spi,
+                           cs_pin=ecs,
+                           dc_pin=dc,
+                           sramcs_pin=srcs,
+                           rst_pin=rst,
+                           busy_pin=busy,
+                           )
 
 display.rotation = 1
 
@@ -58,28 +58,6 @@ large_font = ImageFont.truetype(
     "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 64
 )
 
-# Map the OpenWeatherMap icon code to the appropriate font character
-# See http://www.alessioatzeni.com/meteocons/ for icons
-ICON_MAP = {
-    "01d": "B",
-    "01n": "C",
-    "02d": "H",
-    "02n": "I",
-    "03d": "N",
-    "03n": "N",
-    "04d": "Y",
-    "04n": "Y",
-    "09d": "Q",
-    "09n": "Q",
-    "10d": "R",
-    "10n": "R",
-    "11d": "Z",
-    "11n": "Z",
-    "13d": "W",
-    "13n": "W",
-    "50d": "J",
-    "50n": "K",
-}
 
 def update_display():
     r = requests.get("http://weather:8111")
@@ -87,26 +65,26 @@ def update_display():
         # TODO: Draw the error on screen
         print("error")
         sys.exit(1)
-    
+
     lines = r.text.split("\n")
     for line in lines:
         if line.startswith("weather_temp_terasa"):
-            _ , temp = line.split()
+            _, temp = line.split()
             continue
-    
+
         if line.startswith("co2_ppm"):
-            _ , co2 = line.split()
+            _, co2 = line.split()
             continue
-    
+
         if line.startswith("pressure_sea_level_hpa"):
-            _ , pressure = line.split()
+            _, pressure = line.split()
             continue
-    
+
     image = Image.new("RGB", (display.width, display.height))
-    
+
     # Get drawing object to draw on image.
     draw = ImageDraw.Draw(image)
-    
+
     # Draw a filled box as the background
     draw.rectangle((0, 0, display.width - 1, display.height - 1), fill=BACKGROUND_COLOR)
 
@@ -140,14 +118,14 @@ def update_display():
         font=large_font,
         fill=TEXT_COLOR,
     )
-    
-    # Display CO2 level
+
+    # Display CO2 level.
     # TODO: diplay warning sign if above threshold
     co2 = int(float(co2))
     text = f"CO2: {co2} ppm"
     print(text)
     # TODO: the +5 should be proportional to the previous text height
-    coords = (0, text_height + 10)   # use previous text height
+    coords = (0, text_height + 10)  # use previous text height
     y = text_height + 10
     (text_width, text_height) = font.getsize(text)
     y = y + text_height
@@ -158,13 +136,12 @@ def update_display():
         font=font,
         fill=TEXT_COLOR,
     )
-    
-    # Display CO2 level
-    # TODO: diplay warning sign if above threshold
+
+    # Display atmospheric pressure level.
     pressure = int(float(pressure))
     text = f"Pressure: {pressure} hPa"
     print(text)
-    coords = (0, y)   # use previous text height
+    coords = (0, y)  # use previous text height
     print(f"coordinates = {coords}")
     draw.text(
         coords,
@@ -172,8 +149,7 @@ def update_display():
         font=font,
         fill=TEXT_COLOR,
     )
-    
-    
+
     # Display image.
     print("display in progress")
     display.image(image)
@@ -186,4 +162,3 @@ if __name__ == "__main__":
     while True:
         update_display()
         time.sleep(120)
-

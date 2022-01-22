@@ -67,11 +67,11 @@ def get_metrics(url):
 
     logger = logging.getLogger(__name__)
 
-    r = requests.get(url)
-    if r.status_code != 200:
-        logger.error(f"cannot retrieve metrics from {url}: {r.status_code}")
+    response = requests.get(url)
+    if response.status_code != 200:
+        logger.error(f"cannot retrieve metrics from {url}: {response.status_code}")
     else:
-        lines = r.text.split("\n")
+        lines = response.text.split("\n")
         for line in lines:
             if line.startswith("weather_temp_terasa"):
                 _, temp = line.split()
@@ -110,10 +110,10 @@ def update_display(url):
     text = now.strftime("%H:%M").lstrip("0").replace(" 0", " ")
     logger.debug(text)
     (text_width, text_height) = medium_font.getsize(text)
-    coords = (display.width - text_width - 10, 0)
-    logger.debug(f"coordinates = {coords}")
+    coordinates = (display.width - text_width - 10, 0)
+    logger.debug(f"coordinates = {coordinates}")
     draw.text(
-        coords,
+        coordinates,
         text,
         font=medium_font,
         fill=TEXT_COLOR,
@@ -129,11 +129,10 @@ def update_display(url):
     (text_width, text_height) = large_font.getsize(text)
     logger.debug(f"text width={text_width}, height={text_height}")
     logger.debug(f"display width={display.width}, height={display.height}")
-    # coords = (display.width // 2 - text_width // 2, display.height // 2 - text_height // 2)
-    coords = (0, 0)
-    logger.debug(f"coordinates = {coords}")
+    coordinates = (0, 0)
+    logger.debug(f"coordinates = {coordinates}")
     draw.text(
-        coords,
+        coordinates,
         text,
         font=large_font,
         fill=TEXT_COLOR,
@@ -146,13 +145,13 @@ def update_display(url):
     else:
         text = "CO2: N/A"
     logger.debug(text)
-    coords = (0, text_height + 10)  # use previous text height
+    coordinates = (0, text_height + 10)  # use previous text height
     y = text_height + 10
     (text_width, text_height) = medium_font.getsize(text)
     y = y + text_height
-    logger.debug(f"coordinates = {coords}")
+    logger.debug(f"coordinates = {coordinates}")
     draw.text(
-        coords,
+        coordinates,
         text,
         font=medium_font,
         fill=TEXT_COLOR,
@@ -165,10 +164,10 @@ def update_display(url):
     else:
         text = "Pressure: N/A"
     logger.debug(text)
-    coords = (0, y)  # use previous text height
-    logger.debug(f"coordinates = {coords}")
+    coordinates = (0, y)  # use previous text height
+    logger.debug(f"coordinates = {coordinates}")
     draw.text(
-        coords,
+        coordinates,
         text,
         font=medium_font,
         fill=TEXT_COLOR,

@@ -12,14 +12,18 @@ sudo raspi-config
 - install pre-requisites
 ```
   sudo apt-get install -y python3-pip
-  sudo pip3 install adafruit-circuitpython-epd
   sudo apt-get install -y fonts-dejavu
-  sudo apt-get install -y python3-pil
 ```
 - checkout the Git repository
 ```
   mkdir /srv
   git clone https://github.com/vladak/zerodisplay /srv/zerodisplay
+```
+- install requirements:
+```
+  python3 -m venv env
+  . ./env/bin/activate
+  pip install -r requirements.txt
 ```
 - enable+start the service
 ```

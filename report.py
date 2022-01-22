@@ -21,7 +21,6 @@ WHITE = (0xFF, 0xFF, 0xFF)
 BLACK = (0x00, 0x00, 0x00)
 
 # Next define some constants to allow easy resizing of shapes and colors
-FONTSIZE = 24
 BACKGROUND_COLOR = WHITE
 FOREGROUND_COLOR = WHITE
 TEXT_COLOR = BLACK
@@ -44,9 +43,6 @@ display = Adafruit_SSD1680(122, 250,  # 2.13" HD Tri-color or mono display
                            )
 
 display.rotation = 1
-
-# Load a TTF Font
-font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", FONTSIZE)
 
 small_font = ImageFont.truetype(
     "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 16
@@ -148,7 +144,7 @@ def update_display():
     draw.text(
         coords,
         text,
-        font=font,
+        font=medium_font,
         fill=TEXT_COLOR,
     )
 
@@ -164,7 +160,7 @@ def update_display():
     draw.text(
         coords,
         text,
-        font=font,
+        font=medium_font,
         fill=TEXT_COLOR,
     )
 

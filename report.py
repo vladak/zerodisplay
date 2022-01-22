@@ -147,9 +147,9 @@ def update_display(url):
         text = "CO2: N/A"
     logger.debug(text)
     coordinates = (0, text_height + 10)  # use previous text height
-    y = text_height + 10
+    current_height = text_height + 10
     (text_width, text_height) = medium_font.getsize(text)
-    y = y + text_height
+    current_height = current_height + text_height
     logger.debug(f"coordinates = {coordinates}")
     draw.text(
         coordinates,
@@ -165,7 +165,7 @@ def update_display(url):
     else:
         text = "Pressure: N/A"
     logger.debug(text)
-    coordinates = (0, y)  # use previous text height
+    coordinates = (0, current_height)  # use previous text height
     logger.debug(f"coordinates = {coordinates}")
     draw.text(
         coordinates,

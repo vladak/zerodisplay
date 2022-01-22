@@ -28,6 +28,7 @@ sudo raspi-config
   cd /srv/zerodisplay
   python3 -m venv env
   . ./env/bin/activate
+  export CFLAGS=-fcommon # needed for RPi.GPIO per https://askubuntu.com/a/1330210
   pip install -r requirements.txt
 ```
 - enable+start the service

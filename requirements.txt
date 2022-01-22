@@ -1,3 +1,4 @@
 adafruit-circuitpython-epd
 pillow
 requests
+wheel

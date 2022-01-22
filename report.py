@@ -57,25 +57,39 @@ large_font = ImageFont.truetype(
 )
 
 
-def update_display():
-    r = requests.get("http://weather:8111")
+def get_metrics(url):
+    """
+    Retrieve metrics from given URL and return them. If a metric cannot be retrieved,
+    None is used instead.
+    :return: tuple of temperature, CO2, atmospheric pressure
+    """
+    temp = None
+    co2 = None
+    pressure = None
+
+    r = requests.get(url)
     if r.status_code != 200:
-        print("error")
-        sys.exit(1)
+        print(f"cannot retrieve metrics from {url}: {r.status_code}")
+    else:
+        lines = r.text.split("\n")
+        for line in lines:
+            if line.startswith("weather_temp_terasa"):
+                _, temp = line.split()
+                continue
 
-    lines = r.text.split("\n")
-    for line in lines:
-        if line.startswith("weather_temp_terasa"):
-            _, temp = line.split()
-            continue
+            if line.startswith("co2_ppm"):
+                _, co2 = line.split()
+                continue
 
-        if line.startswith("co2_ppm"):
-            _, co2 = line.split()
-            continue
+            if line.startswith("pressure_sea_level_hpa"):
+                _, pressure = line.split()
+                continue
 
-        if line.startswith("pressure_sea_level_hpa"):
-            _, pressure = line.split()
-            continue
+    return temp, co2, pressure
+
+
+def update_display():
+    temp, co2, pressure = get_metrics("http://weather:8111")
 
     image = Image.new("RGB", (display.width, display.height))
 
@@ -100,8 +114,11 @@ def update_display():
     )
 
     # Display outside temperature.
-    outside_temp = int(float(temp))
-    text = f"{outside_temp}°C"
+    if temp:
+        outside_temp = int(float(temp))
+        text = f"{outside_temp}°C"
+    else:
+        text = "N/A"
     print(text)
     (text_width, text_height) = large_font.getsize(text)
     print(f"text width={text_width}, height={text_height}")
@@ -117,10 +134,12 @@ def update_display():
     )
 
     # Display CO2 level.
-    co2 = int(float(co2))
-    text = f"CO2: {co2} ppm"
+    if co2:
+        co2 = int(float(co2))
+        text = f"CO2: {co2} ppm"
+    else:
+        text = "CO2: N/A"
     print(text)
-    # TODO: the +5 should be proportional to the previous text height
     coords = (0, text_height + 10)  # use previous text height
     y = text_height + 10
     (text_width, text_height) = font.getsize(text)
@@ -134,8 +153,11 @@ def update_display():
     )
 
     # Display atmospheric pressure level.
-    pressure = int(float(pressure))
-    text = f"Pressure: {pressure} hPa"
+    if pressure:
+        pressure = int(float(pressure))
+        text = f"Pressure: {pressure} hPa"
+    else:
+        text = "Pressure: N/A"
     print(text)
     coords = (0, y)  # use previous text height
     print(f"coordinates = {coords}")

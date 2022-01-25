@@ -11,6 +11,8 @@ The goal of this tiny project is to display outside temperature and a few other 
 - Apple Magic mouse.. wait for it.. transparent enclosure
 - a nice drawing
 
+It looks like this: ![Magic enclosure](/magic_enclosure.jpg)
+
 ## Install
 
 per https://learn.adafruit.com/2-13-in-e-ink-bonnet/usage

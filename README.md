@@ -2,6 +2,15 @@
 
 # zerodisplay
 
+The goal of this tiny project is to display outside temperature and a few other metrics (CO2, atmospheric pressure) on a display attached to a fridge. This assume this data is already collected elsewhere and available via HTTP. Specifically this assumes https://github.com/vladak/weather.
+
+## Hardware
+
+- [Raspberry Pi Zero WH](https://www.adafruit.com/product/3708)
+- [Adafruit 2.13" Monochrome E-Ink Bonnet](https://www.adafruit.com/product/4687)
+- Apple Magic mouse.. wait for it.. transparent enclosure
+- a nice drawing
+
 ## Install
 
 per https://learn.adafruit.com/2-13-in-e-ink-bonnet/usage

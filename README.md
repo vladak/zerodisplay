@@ -13,6 +13,8 @@ The goal of this tiny project is to display outside temperature and a few other 
 
 It looks like this: ![Magic enclosure](/magic_enclosure.jpg)
 
+The buttons are currently unused, might drill the holes for them one day, in order to be able to switch to e.g. a name-of-the-day display.
+
 ## Install
 
 per https://learn.adafruit.com/2-13-in-e-ink-bonnet/usage

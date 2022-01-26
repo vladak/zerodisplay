@@ -124,7 +124,9 @@ def draw_image(url, display_width, display_height, medium_font_path, large_font_
 
     draw_date_time(display_width, draw, medium_font)
 
-    text_height = draw_outside_temperature(draw, temp, display_height, display_width, large_font)
+    text_height = draw_outside_temperature(
+        draw, temp, display_height, display_width, large_font
+    )
     current_height = draw_co2(draw, co2, text_height, medium_font)
     draw_pressure(current_height, draw, medium_font, pressure)
 
@@ -308,13 +310,13 @@ def parse_args():
         "-m",
         "--medium_font",
         help="Medium font path",
-        default="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+        default="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
     )
     parser.add_argument(
         "-L",
         "--large_font",
         help="Large font path",
-        default="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+        default="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
     )
 
     return parser.parse_args()
@@ -335,15 +337,17 @@ def main():
     display_width = 250
 
     if args.output:
-        image = draw_image(args.url, display_width, display_height,
-                           args.medium_font, args.large_font)
+        image = draw_image(
+            args.url, display_width, display_height, args.medium_font, args.large_font
+        )
         image.save(args.output)
         return
 
     display = get_e_ink_display(display_height, display_width)
     while True:
-        image = draw_image(args.url, display.width, display.height,
-                           args.medium_font, args.large_font)
+        image = draw_image(
+            args.url, display.width, display.height, args.medium_font, args.large_font
+        )
         update_e_ink_display(display, image)
         time.sleep(args.timeout)
 

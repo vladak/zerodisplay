@@ -109,6 +109,7 @@ def draw_image(url, display_width, display_height, medium_font_path, large_font_
     :return PIL image instance
     """
 
+    small_font = ImageFont.truetype(large_font_path, 12)
     medium_font = ImageFont.truetype(medium_font_path, 24)
     large_font = ImageFont.truetype(large_font_path, 64)
 
@@ -127,7 +128,7 @@ def draw_image(url, display_width, display_height, medium_font_path, large_font_
     text_height = draw_outside_temperature(
         draw, temp, display_height, display_width, large_font
     )
-    current_height = draw_co2(draw, co2, text_height, medium_font)
+    current_height = draw_co2(draw, co2, text_height, medium_font, small_font)
     draw_pressure(current_height, draw, medium_font, pressure)
 
     return image
@@ -160,7 +161,7 @@ def draw_pressure(current_height, draw, medium_font, pressure):
     )
 
 
-def draw_co2(draw, co2, text_height, medium_font):
+def draw_co2(draw, co2, text_height, medium_font, small_font):
     """
     :param draw:
     :param co2:
@@ -171,23 +172,34 @@ def draw_co2(draw, co2, text_height, medium_font):
     logger = logging.getLogger(__name__)
 
     # Display CO2 level.
+    co_text = "CO"
     if co2:
         co2 = int(float(co2))
-        text = f"CO2: {co2} ppm"
+        text = f"{co_text} : {co2} ppm"
     else:
-        text = "CO2: N/A"
-    logger.debug(text)
+        text = f"{co_text} : N/A"
     coordinates = (0, text_height + 10)  # use previous text height
     current_height = text_height + 10
-    (_, text_height) = medium_font.getsize(text)
+    (text_width, text_height) = medium_font.getsize(text)
     current_height = current_height + text_height
-    logger.debug(f"coordinates = {coordinates}")
+    logger.debug(f"'{text}' coordinates = {coordinates}")
     draw.text(
         coordinates,
         text,
         font=medium_font,
         fill=TEXT_COLOR,
     )
+
+    (co_width, _) = medium_font.getsize(co_text)
+    coordinates = (co_width, current_height - 10)
+    logger.debug(f"'2' coordinates = {coordinates}")
+    draw.text(
+        coordinates,
+        "2",
+        font=small_font,
+        fill=TEXT_COLOR,
+    )
+
     return current_height
 
 

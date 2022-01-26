@@ -125,24 +125,49 @@ def draw_image(url, display_width, display_height, medium_font_path, large_font_
 
     draw_date_time(display_width, draw, medium_font)
 
-    # Display outside temperature.
-    if temp:
-        outside_temp = int(float(temp))
-        text = f"{outside_temp}°C"
+    text_height = draw_outside_temperature(draw, temp, display_height, display_width, large_font)
+    current_height = draw_co2(draw, co2, text_height, medium_font)
+    draw_pressure(current_height, draw, medium_font, pressure)
+
+    return image
+
+
+def draw_pressure(current_height, draw, medium_font, pressure):
+    """
+    :param current_height:
+    :param draw:
+    :param medium_font:
+    :param pressure:
+    :return:
+    """
+    logger = logging.getLogger(__name__)
+
+    # Display atmospheric pressure level.
+    if pressure:
+        pressure = int(float(pressure))
+        text = f"Pressure: {pressure} hPa"
     else:
-        text = "N/A"
+        text = "Pressure: N/A"
     logger.debug(text)
-    (text_width, text_height) = large_font.getsize(text)
-    logger.debug(f"text width={text_width}, height={text_height}")
-    logger.debug(f"display width={display_width}, height={display_height}")
-    coordinates = (0, 0)
+    coordinates = (0, current_height)  # use previous text height
     logger.debug(f"coordinates = {coordinates}")
     draw.text(
         coordinates,
         text,
-        font=large_font,
+        font=medium_font,
         fill=TEXT_COLOR,
     )
+
+
+def draw_co2(draw, co2, text_height, medium_font):
+    """
+    :param draw:
+    :param co2:
+    :param text_height:
+    :param medium_font:
+    :return: current text height
+    """
+    logger = logging.getLogger(__name__)
 
     # Display CO2 level.
     if co2:
@@ -162,24 +187,39 @@ def draw_image(url, display_width, display_height, medium_font_path, large_font_
         font=medium_font,
         fill=TEXT_COLOR,
     )
+    return current_height
 
-    # Display atmospheric pressure level.
-    if pressure:
-        pressure = int(float(pressure))
-        text = f"Pressure: {pressure} hPa"
+
+def draw_outside_temperature(draw, temp, display_height, display_width, large_font):
+    """
+    :param draw:
+    :param temp:
+    :param display_height:
+    :param display_width:
+    :param large_font:
+    :return: current text height
+    """
+    logger = logging.getLogger(__name__)
+
+    # Display outside temperature.
+    if temp:
+        outside_temp = int(float(temp))
+        text = f"{outside_temp}°C"
     else:
-        text = "Pressure: N/A"
+        text = "N/A"
     logger.debug(text)
-    coordinates = (0, current_height)  # use previous text height
+    (text_width, text_height) = large_font.getsize(text)
+    logger.debug(f"text width={text_width}, height={text_height}")
+    logger.debug(f"display width={display_width}, height={display_height}")
+    coordinates = (0, 0)
     logger.debug(f"coordinates = {coordinates}")
     draw.text(
         coordinates,
         text,
-        font=medium_font,
+        font=large_font,
         fill=TEXT_COLOR,
     )
-
-    return image
+    return text_height
 
 
 def draw_date_time(display_width, draw, medium_font):

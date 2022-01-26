@@ -177,7 +177,7 @@ def draw_co2(draw, co2, text_height, medium_font):
     logger.debug(text)
     coordinates = (0, text_height + 10)  # use previous text height
     current_height = text_height + 10
-    (text_width, text_height) = medium_font.getsize(text)
+    (_, text_height) = medium_font.getsize(text)
     current_height = current_height + text_height
     logger.debug(f"coordinates = {coordinates}")
     draw.text(

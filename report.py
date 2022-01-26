@@ -45,8 +45,8 @@ def get_metrics(url):
 
     try:
         response = requests.get(url)
-    except Exception as exc:
-        logger.error(f"cannot get data from {url}: {exc}")
+    except Exception as req_exc:
+        logger.error(f"cannot get data from {url}: {req_exc}")
         return temp, co2, pressure
 
     if response.status_code != 200:
@@ -73,9 +73,10 @@ def get_e_ink_display(height, width):
     """
     :return: eInk display instance
     """
-    # create the spi device and pins we will need
+    # Create the SPI device and pins we will need.
     spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
     ecs = digitalio.DigitalInOut(board.CE0)
+    # pylint: disable=invalid-name
     dc = digitalio.DigitalInOut(board.D22)
     rst = digitalio.DigitalInOut(board.D27)
     busy = digitalio.DigitalInOut(board.D17)

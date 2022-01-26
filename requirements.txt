@@ -1,4 +1,6 @@
 adafruit-circuitpython-epd
+adafruit-blinka
+adafruit-platformdetect
 pillow
 requests
 wheel

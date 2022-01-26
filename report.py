@@ -9,9 +9,12 @@ import logging
 import time
 from datetime import datetime
 
-import board
-import busio
-import digitalio
+try:
+    import board
+    import busio
+    import digitalio
+except NotImplementedError as exc:
+    print(f"Will only support running with -o: {exc}")
 import requests
 from adafruit_epd.ssd1680 import Adafruit_SSD1680
 from PIL import Image, ImageDraw, ImageFont
@@ -27,34 +30,6 @@ BACKGROUND_COLOR = WHITE
 FOREGROUND_COLOR = WHITE
 TEXT_COLOR = BLACK
 
-# create the spi device and pins we will need
-spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
-ecs = digitalio.DigitalInOut(board.CE0)
-dc = digitalio.DigitalInOut(board.D22)
-rst = digitalio.DigitalInOut(board.D27)
-busy = digitalio.DigitalInOut(board.D17)
-
-display = Adafruit_SSD1680(
-    122,
-    250,  # 2.13" HD Tri-color or mono display
-    spi,
-    cs_pin=ecs,
-    dc_pin=dc,
-    sramcs_pin=None,
-    rst_pin=rst,
-    busy_pin=busy,
-)
-
-display.rotation = 1
-
-small_font = ImageFont.truetype(
-    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 16
-)
-medium_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
-large_font = ImageFont.truetype(
-    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 64
-)
-
 
 def get_metrics(url):
     """
@@ -68,7 +43,12 @@ def get_metrics(url):
 
     logger = logging.getLogger(__name__)
 
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
+    except Exception as exc:
+        logger.error(f"cannot get data from {url}: {exc}")
+        return temp, co2, pressure
+
     if response.status_code != 200:
         logger.error(f"cannot retrieve metrics from {url}: {response.status_code}")
     else:
@@ -89,29 +69,62 @@ def get_metrics(url):
     return temp, co2, pressure
 
 
-def update_display(url):
+def get_e_ink_display(height, width):
+    """
+    :return: eInk display instance
+    """
+    # create the spi device and pins we will need
+    spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
+    ecs = digitalio.DigitalInOut(board.CE0)
+    dc = digitalio.DigitalInOut(board.D22)
+    rst = digitalio.DigitalInOut(board.D27)
+    busy = digitalio.DigitalInOut(board.D17)
+
+    display = Adafruit_SSD1680(
+        height,
+        width,
+        spi,
+        cs_pin=ecs,
+        dc_pin=dc,
+        sramcs_pin=None,
+        rst_pin=rst,
+        busy_pin=busy,
+    )
+
+    display.rotation = 1
+
+    return display
+
+
+def draw_image(url, display_width, display_height, medium_font_path, large_font_path):
     """
     Refresh the display with weather metrics retrieved from the URL
+    :param display_height: display width in pixels
+    :param display_width: display height in pixels
     :param url: URL to retrieve the metrics from
+    :return PIL image instance
     """
     logger = logging.getLogger(__name__)
 
+    medium_font = ImageFont.truetype(medium_font_path, 24)
+    large_font = ImageFont.truetype(large_font_path, 64)
+
     temp, co2, pressure = get_metrics(url)
 
-    image = Image.new("RGB", (display.width, display.height))
+    image = Image.new("RGB", (display_width, display_height))
 
     # Get drawing object to draw on image.
     draw = ImageDraw.Draw(image)
 
     # Draw a filled box as the background
-    draw.rectangle((0, 0, display.width - 1, display.height - 1), fill=BACKGROUND_COLOR)
+    draw.rectangle((0, 0, display_width - 1, display_height - 1), fill=BACKGROUND_COLOR)
 
     # Display time
     now = datetime.now()
     text = now.strftime(f"{now.hour}:%M")
     logger.debug(text)
     (text_width, text_height) = medium_font.getsize(text)
-    coordinates = (display.width - text_width - 10, 0)
+    coordinates = (display_width - text_width - 10, 0)
     logger.debug(f"coordinates = {coordinates}")
     draw.text(
         coordinates,
@@ -129,7 +142,7 @@ def update_display(url):
     logger.debug(text)
     (text_width, text_height) = large_font.getsize(text)
     logger.debug(f"text width={text_width}, height={text_height}")
-    logger.debug(f"display width={display.width}, height={display.height}")
+    logger.debug(f"display width={display_width}, height={display_height}")
     coordinates = (0, 0)
     logger.debug(f"coordinates = {coordinates}")
     draw.text(
@@ -174,7 +187,18 @@ def update_display(url):
         fill=TEXT_COLOR,
     )
 
-    # Display image.
+    return image
+
+
+def update_e_ink_display(display, image):
+    """
+    Display image.
+    :param display:
+    :param image:
+    :return:
+    """
+    logger = logging.getLogger(__name__)
+
     logger.debug("display in progress")
     display.image(image)
     display.display()
@@ -208,6 +232,23 @@ def parse_args():
         help="URL to query for metrics in Prometheus format",
         default="http://weather:8111",
     )
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="Instead of updating the display, print the image to a JPG file",
+    )
+    parser.add_argument(
+        "-m",
+        "--medium_font",
+        help="Medium font path",
+        default="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    )
+    parser.add_argument(
+        "-L",
+        "--large_font",
+        help="Large font path",
+        default="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+    )
 
     return parser.parse_args()
 
@@ -222,8 +263,21 @@ def main():
     logger = logging.getLogger(__name__)
     logger.setLevel(args.loglevel)
 
+    # 2.13" HD Tri-color or mono display
+    display_height = 122
+    display_width = 250
+
+    if args.output:
+        image = draw_image(args.url, display_width, display_height,
+                           args.medium_font, args.large_font)
+        image.save(args.output)
+        return
+
+    display = get_e_ink_display(display_height, display_width)
     while True:
-        update_display(args.url)
+        image = draw_image(args.url, display.width, display.height,
+                           args.medium_font, args.large_font)
+        update_e_ink_display(display, image)
         time.sleep(args.timeout)
 
 

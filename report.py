@@ -7,6 +7,7 @@ Display weather metrics on ePaper.
 import argparse
 import logging
 import time
+import sys
 from datetime import datetime
 
 try:
@@ -45,7 +46,7 @@ def get_metrics(url):
 
     try:
         response = requests.get(url)
-    except Exception as req_exc:
+    except requests.ConnectionError as req_exc:
         logger.error(f"cannot get data from {url}: {req_exc}")
         return temp, co2, pressure
 
@@ -283,4 +284,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.exit(0)

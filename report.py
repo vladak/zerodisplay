@@ -135,6 +135,18 @@ def draw_image(url, display_width, display_height, medium_font_path, large_font_
         fill=TEXT_COLOR,
     )
 
+    # Display date underneath the time.
+    text = now.strftime(f"{now.day}.{now.month}.")
+    logger.debug(text)
+    coordinates = (display_width - text_width - 10, text_height + 5)
+    logger.debug(f"coordinates = {coordinates}")
+    draw.text(
+        coordinates,
+        text,
+        font=medium_font,
+        fill=TEXT_COLOR,
+    )
+
     # Display outside temperature.
     if temp:
         outside_temp = int(float(temp))

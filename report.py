@@ -108,7 +108,6 @@ def draw_image(url, display_width, display_height, medium_font_path, large_font_
     :param url: URL to retrieve the metrics from
     :return PIL image instance
     """
-    logger = logging.getLogger(__name__)
 
     medium_font = ImageFont.truetype(medium_font_path, 24)
     large_font = ImageFont.truetype(large_font_path, 64)

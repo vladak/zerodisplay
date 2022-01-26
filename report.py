@@ -6,8 +6,8 @@ Display weather metrics on ePaper.
 
 import argparse
 import logging
-import time
 import sys
+import time
 from datetime import datetime
 
 try:

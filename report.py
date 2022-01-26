@@ -101,6 +101,8 @@ def get_e_ink_display(height, width):
 def draw_image(url, display_width, display_height, medium_font_path, large_font_path):
     """
     Refresh the display with weather metrics retrieved from the URL
+    :param large_font_path: path to font used for large letters
+    :param medium_font_path: path to font used for medium letters
     :param display_height: display width in pixels
     :param display_width: display height in pixels
     :param url: URL to retrieve the metrics from

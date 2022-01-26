@@ -108,7 +108,7 @@ def update_display(url):
 
     # Display time
     now = datetime.now()
-    text = now.strftime("%H:%M")
+    text = now.strftime(f"{d.hour}:%M")
     logger.debug(text)
     (text_width, text_height) = medium_font.getsize(text)
     coordinates = (display.width - text_width - 10, 0)

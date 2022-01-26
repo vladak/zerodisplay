@@ -121,31 +121,7 @@ def draw_image(url, display_width, display_height, medium_font_path, large_font_
     # Draw a filled box as the background
     draw.rectangle((0, 0, display_width - 1, display_height - 1), fill=BACKGROUND_COLOR)
 
-    # Display time
-    now = datetime.now()
-    text = now.strftime(f"{now.hour}:%M")
-    logger.debug(text)
-    (text_width, text_height) = medium_font.getsize(text)
-    coordinates = (display_width - text_width - 10, 0)
-    logger.debug(f"coordinates = {coordinates}")
-    draw.text(
-        coordinates,
-        text,
-        font=medium_font,
-        fill=TEXT_COLOR,
-    )
-
-    # Display date underneath the time.
-    text = now.strftime(f"{now.day}.{now.month}.")
-    logger.debug(text)
-    coordinates = (display_width - text_width - 10, text_height + 5)
-    logger.debug(f"coordinates = {coordinates}")
-    draw.text(
-        coordinates,
-        text,
-        font=medium_font,
-        fill=TEXT_COLOR,
-    )
+    draw_date_time(display_width, draw, medium_font)
 
     # Display outside temperature.
     if temp:
@@ -202,6 +178,42 @@ def draw_image(url, display_width, display_height, medium_font_path, large_font_
     )
 
     return image
+
+
+def draw_date_time(display_width, draw, medium_font):
+    """
+    Draw date and time in the right top corner.
+    :param display_width:
+    :param draw:
+    :param medium_font:
+    :return:
+    """
+    logger = logging.getLogger(__name__)
+
+    # Display time.
+    now = datetime.now()
+    text = now.strftime(f"{now.hour}:%M")
+    logger.debug(text)
+    (text_width, text_height) = medium_font.getsize(text)
+    coordinates = (display_width - text_width - 10, 0)
+    logger.debug(f"coordinates = {coordinates}")
+    draw.text(
+        coordinates,
+        text,
+        font=medium_font,
+        fill=TEXT_COLOR,
+    )
+    # Display date underneath the time.
+    text = now.strftime(f"{now.day}.{now.month}.")
+    logger.debug(text)
+    coordinates = (display_width - text_width - 10, text_height + 5)
+    logger.debug(f"coordinates = {coordinates}")
+    draw.text(
+        coordinates,
+        text,
+        font=medium_font,
+        fill=TEXT_COLOR,
+    )
 
 
 def update_e_ink_display(display, image):

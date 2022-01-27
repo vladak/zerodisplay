@@ -11,6 +11,7 @@ import requests
 from PIL import Image, ImageDraw, ImageFont
 
 
+# pylint: disable=too-many-instance-attributes
 class Display:
     """
     Class to wrap fetching and drawing of the metrics.
@@ -25,6 +26,7 @@ class Display:
     FOREGROUND_COLOR = WHITE
     TEXT_COLOR = BLACK
 
+    # pylint: disable=too-many-arguments
     def __init__(self, url, display_width, display_height, medium_font_path, large_font_path):
         """
         :param url: URL to retrieve the metrics from

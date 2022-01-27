@@ -172,7 +172,6 @@ class Display:
 
     def draw_outside_temperature(self, temp):
         """
-        :param draw:
         :param temp: temperature value
         :return: current text height
         """

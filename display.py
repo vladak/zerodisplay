@@ -25,23 +25,21 @@ class Display:
     FOREGROUND_COLOR = WHITE
     TEXT_COLOR = BLACK
 
-    def __init__(self, url, display_width, display_height, medium_font, large_font):
+    def __init__(self, url, display_width, display_height, medium_font_path, large_font_path):
         """
         :param url: URL to retrieve the metrics from
         :param display_height: display width in pixels
         :param display_width: display height in pixels
-        :param large_font: path to font used for large letters
-        :param medium_font: path to font used for medium letters
+        :param large_font_path: path to font used for large letters
+        :param medium_font_path: path to font used for medium letters
         """
         self.url = url
         self.display_width = display_width
         self.display_height = display_height
-        self.medium_font_path = medium_font
-        self.large_font_path = large_font
 
-        self.small_font = ImageFont.truetype(self.large_font_path, 12)
-        self.medium_font = ImageFont.truetype(self.medium_font_path, 24)
-        self.large_font = ImageFont.truetype(self.large_font_path, 64)
+        self.small_font = ImageFont.truetype(large_font_path, 12)
+        self.medium_font = ImageFont.truetype(medium_font_path, 24)
+        self.large_font = ImageFont.truetype(large_font_path, 64)
 
         self.image = Image.new("RGB", (self.display_width, self.display_height))
 

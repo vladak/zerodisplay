@@ -4,3 +4,4 @@ adafruit-platformdetect
 pillow
 requests
 wheel
+prometheus-api-client

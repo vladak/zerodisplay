@@ -29,6 +29,7 @@ sudo raspi-config
   sudo apt-get install -y python3-venv
   sudo apt-get install -y fonts-dejavu
   sudo apt-get install -y libopenjp2-7 # needed for Pillow
+  sudo apt-get install -y libatlas-base-dev # needed for numpy used by prometheus-api-client
 ```
 - checkout the Git repository
 ```

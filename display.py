@@ -7,8 +7,9 @@ Not dependent on the output type.
 import logging
 from datetime import datetime
 
-import requests
 from PIL import Image, ImageDraw, ImageFont
+from prometheus_api_client import (MetricsList, PrometheusApiClientException,
+                                   PrometheusConnect)
 
 
 # pylint: disable=too-many-instance-attributes
@@ -50,11 +51,23 @@ class Display:
         # Get drawing object to draw on image.
         self.draw = ImageDraw.Draw(self.image)
 
+        self.prometheus_connect = PrometheusConnect(url=url)
+
+    def extract_metric_from_data(self, data):
+        """
+        Given JSON string, extract metric value and return as string
+        :param data:
+        :return:
+        """
+        temp_list = MetricsList(data)
+        metric = temp_list[0]
+        return str(metric.metric_values.y[0])
+
     def get_metrics(self):
         """
         Retrieve metrics from given URL and return them. If a metric cannot be retrieved,
         None is used instead.
-        :return: tuple of temperature, CO2, atmospheric pressure
+        :return: tuple of temperature, CO2, atmospheric pressure (as strings)
         """
         temp = None
         co2 = None
@@ -62,30 +75,32 @@ class Display:
 
         logger = logging.getLogger(__name__)
 
+        my_label_config = {"sensor": "shield"}
         try:
-            response = requests.get(self.url)
-        except requests.ConnectionError as req_exc:
-            logger.error(f"cannot get data from {self.url}: {req_exc}")
-            return temp, co2, pressure
-
-        if response.status_code != 200:
-            logger.error(
-                f"cannot retrieve metrics from {self.url}: {response.status_code}"
+            temp_data = self.prometheus_connect.get_current_metric_value(
+                metric_name="temperature", label_config=my_label_config
             )
-        else:
-            lines = response.text.split("\n")
-            for line in lines:
-                if line.startswith("weather_temp_terasa"):
-                    _, temp = line.split()
-                    continue
+            temp = self.extract_metric_from_data(temp_data)
+        except (PrometheusApiClientException, IndexError) as req_exc:
+            logger.error(f"cannot get data for temperature from {self.url}: {req_exc}")
 
-                if line.startswith("co2_ppm"):
-                    _, co2 = line.split()
-                    continue
+        try:
+            co2_data = self.prometheus_connect.get_current_metric_value(
+                metric_name="co2_ppm"
+            )
+            co2 = self.extract_metric_from_data(co2_data)
+        except (PrometheusApiClientException, IndexError) as req_exc:
+            logger.error(f"cannot get data for CO2 from {self.url}: {req_exc}")
 
-                if line.startswith("pressure_sea_level_hpa"):
-                    _, pressure = line.split()
-                    continue
+        try:
+            pressure_data = self.prometheus_connect.get_current_metric_value(
+                metric_name="pressure_sea_level_hpa"
+            )
+            pressure = self.extract_metric_from_data(pressure_data)
+        except (PrometheusApiClientException, IndexError) as req_exc:
+            logger.error(
+                f"cannot get data for barometric pressure from {self.url}: {req_exc}"
+            )
 
         return temp, co2, pressure
 

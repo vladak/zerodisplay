@@ -8,11 +8,8 @@ import logging
 from datetime import datetime
 
 from PIL import Image, ImageDraw, ImageFont
-from prometheus_api_client import (
-    MetricsList,
-    PrometheusApiClientException,
-    PrometheusConnect,
-)
+from prometheus_api_client import (MetricsList, PrometheusApiClientException,
+                                   PrometheusConnect)
 
 
 # pylint: disable=too-many-instance-attributes

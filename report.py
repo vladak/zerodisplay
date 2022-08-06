@@ -87,6 +87,7 @@ def parse_args():
         default=120,
     )
     parser.add_argument(
+        "-U",
         "--url",
         help="URL to query for metrics in Prometheus format",
         default="http://weather:8111",

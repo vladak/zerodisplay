@@ -2,11 +2,12 @@
 Description=eInk display refresh service
 
 [Service]
-User=root
-Group=root
+User=pi
+Group=pi
 Type=simple
 WorkingDirectory=/srv/zerodisplay
-ExecStart=su -c "/srv/zerodisplay/env/bin/python3 /srv/zerodisplay/report.py" - pi
+EnvironmentFile=/srv/zerodisplay/environment
+ExecStart=/srv/zerodisplay/env/bin/python3 /srv/zerodisplay/report.py $ARGS
 ExecStop=/bin/kill -2 $MAINPID
 TimeoutStartSec=0
 Restart=always

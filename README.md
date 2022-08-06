@@ -45,6 +45,12 @@ sudo raspi-config
   export CFLAGS=-fcommon # needed for RPi.GPIO per https://askubuntu.com/a/1330210
   pip install -r requirements.txt
 ```
+- configure the service: create `/srv/zerodisplay/environment` file and setup these environment variables inside:
+  - `ARGS`: arguments to the `report` program
+  - the file can look like this (no double quotes):
+```
+ARGS=-U http://localhost:8111 -l debug
+```
 - enable+start the service
 ```
   sudo cp /srv/zerodisplay/zerodisplay.service /etc/systemd/system/

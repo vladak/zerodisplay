@@ -78,10 +78,9 @@ class Display:
 
         logger = logging.getLogger(__name__)
 
-        my_label_config = {"sensor": "shield"}
         try:
-            temp_data = self.prometheus_connect.get_current_metric_value(
-                metric_name="temperature", label_config=my_label_config
+            temp_data = self.prometheus_connect.custom_query(
+                "last_over_time(temperature{sensor='shield'}[30m])"
             )
             temp = self.extract_metric_from_data(temp_data)
         except (PrometheusApiClientException, IndexError) as req_exc:

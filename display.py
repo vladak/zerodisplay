@@ -96,7 +96,7 @@ class Display:
 
         try:
             pressure_data = self.prometheus_connect.get_current_metric_value(
-                metric_name="pressure_sea_level_hpa"
+                metric_name="pressure_hpa{name='sea'}"
             )
             pressure = self.extract_metric_from_data(pressure_data)
         except (PrometheusApiClientException, IndexError) as req_exc:

@@ -32,7 +32,13 @@ class Display:
 
     # pylint: disable=too-many-arguments
     def __init__(
-        self, url, display_width, display_height, medium_font_path, large_font_path
+        self,
+        url,
+        display_width,
+        display_height,
+        medium_font_path,
+        large_font_path,
+        temp_sensor_name,
     ):
         """
         :param url: URL to retrieve the metrics from
@@ -40,6 +46,7 @@ class Display:
         :param display_width: display height in pixels
         :param large_font_path: path to font used for large letters
         :param medium_font_path: path to font used for medium letters
+        :param temp_sensor_name: temperature sensor name
         """
         self.url = url
         self.display_width = display_width
@@ -48,6 +55,8 @@ class Display:
         self.small_font = ImageFont.truetype(large_font_path, 12)
         self.medium_font = ImageFont.truetype(medium_font_path, 24)
         self.large_font = ImageFont.truetype(large_font_path, 64)
+
+        self.temp_sensor_name = temp_sensor_name
 
         self.image = Image.new("RGB", (self.display_width, self.display_height))
 
@@ -80,7 +89,9 @@ class Display:
 
         try:
             temp_data = self.prometheus_connect.custom_query(
-                "last_over_time(temperature{sensor='shield'}[30m])"
+                # pylint: disable=consider-using-f-string
+                "last_over_time(temperature{sensor='%s'}[30m])"
+                % self.temp_sensor_name
             )
             temp = self.extract_metric_from_data(temp_data)
         except (PrometheusApiClientException, IndexError) as req_exc:

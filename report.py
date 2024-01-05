@@ -109,6 +109,12 @@ def parse_args():
         help="Large font path",
         default="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
     )
+    parser.add_argument(
+        "-T",
+        "--temp_sensor_name",
+        help="Temperature sensor name",
+        required=True,
+    )
 
     return parser.parse_args()
 
@@ -128,7 +134,12 @@ def main():
     display_width = 250
 
     display = Display(
-        args.url, display_width, display_height, args.medium_font, args.large_font
+        args.url,
+        display_width,
+        display_height,
+        args.medium_font,
+        args.large_font,
+        args.temp_sensor_name,
     )
     if args.output:
         image = display.draw_image()
@@ -137,7 +148,12 @@ def main():
 
     e_display = get_e_ink_display(display_height, display_width)
     display = Display(
-        args.url, e_display.width, e_display.height, args.medium_font, args.large_font
+        args.url,
+        e_display.width,
+        e_display.height,
+        args.medium_font,
+        args.large_font,
+        args.temp_sensor_name,
     )
     while True:
         image = display.draw_image()

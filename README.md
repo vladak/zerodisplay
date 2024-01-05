@@ -50,7 +50,7 @@ sudo raspi-config
   - `ARGS`: arguments to the `report` program
   - the file can look like this (no double quotes):
 ```
-ARGS=-U http://localhost:8111 -l debug
+ARGS=-U http://localhost:8111 -l debug --temp_sensor_name foo/bar
 ```
 - enable+start the service
 ```

@@ -180,7 +180,10 @@ class Display:
             text = f"{co_text} : N/A"
         coordinates = (0, text_height + 10)  # use previous text height
         current_height = text_height + 10
-        (_, text_height) = self.medium_font.getsize(text)
+        if hasattr(self.medium_font, "getsize"):
+            (_, text_height) = self.medium_font.getsize(text)
+        else:
+            text_height = self.medium_font.getbbox(text)[3]
         current_height = current_height + text_height
         logger.debug(f"'{text}' coordinates = {coordinates}")
         self.draw.text(
@@ -190,7 +193,10 @@ class Display:
             fill=Display.TEXT_COLOR,
         )
 
-        (co_width, _) = self.medium_font.getsize(co_text)
+        if hasattr(self.medium_font, "getsize"):
+            (co_width, _) = self.medium_font.getsize(co_text)
+        else:
+            co_width = self.medium_font.getbbox(co_text)[2]
         coordinates = (co_width, current_height - 10)
         logger.debug(f"'2' coordinates = {coordinates}")
         self.draw.text(
@@ -216,7 +222,10 @@ class Display:
         else:
             text = "N/A"
         logger.debug(text)
-        (text_width, text_height) = self.large_font.getsize(text)
+        if hasattr(self.medium_font, "getsize"):
+            (text_width, text_height) = self.large_font.getsize(text)
+        else:
+            (text_width, text_height) = self.large_font.getbbox(text)[2:4]
         logger.debug(f"text width={text_width}, height={text_height}")
         logger.debug(
             f"display width={self.display_width}, height={self.display_height}"
@@ -241,7 +250,10 @@ class Display:
         now = datetime.now()
         text = now.strftime(f"{now.hour}:%M")
         logger.debug(text)
-        (text_width, text_height) = self.medium_font.getsize(text)
+        if hasattr(self.medium_font, "getsize"):
+            (text_width, text_height) = self.medium_font.getsize(text)
+        else:
+            (text_width, text_height) = self.medium_font.getbbox(text)[2:4]
         coordinates = (self.display_width - text_width - 10, 0)
         logger.debug(f"coordinates = {coordinates}")
         self.draw.text(

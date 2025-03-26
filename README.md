@@ -17,6 +17,7 @@ The buttons are currently unused, might drill the holes for them one day, in ord
 
 ## Install
 
+- initial setup: https://github.com/vladak/pirig/blob/master/common.md
 - disable not needed services
 ```
 # Bluetooth

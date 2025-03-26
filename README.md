@@ -19,6 +19,12 @@ The buttons are currently unused, might drill the holes for them one day, in ord
 
 per https://learn.adafruit.com/2-13-in-e-ink-bonnet/usage
 
+- disable not needed services
+```
+# Bluetooth
+sudo apt-get purge bluez -y
+sudo apt-get autoremove -y
+```
 - enable SPI (in the `Interfaces` menu):
 ```
 sudo raspi-config

@@ -17,8 +17,6 @@ The buttons are currently unused, might drill the holes for them one day, in ord
 
 ## Install
 
-per https://learn.adafruit.com/2-13-in-e-ink-bonnet/usage
-
 - disable not needed services
 ```
 # Bluetooth
@@ -66,3 +64,8 @@ ARGS=-U http://localhost:8111 -l debug --temp_sensor_name foo/bar
   sudo systemctl start zerodisplay
   sudo systemctl status zerodisplay
 ```
+
+# Links
+
+- https://learn.adafruit.com/2-13-in-e-ink-bonnet/usage
+

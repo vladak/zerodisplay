@@ -172,7 +172,7 @@ class Display:
         logger = logging.getLogger(__name__)
 
         # Display CO2 level.
-        co_text = "CO"
+        co_text = "CO₂"
         if co2:
             co2 = int(float(co2))
             text = f"{co_text} : {co2} ppm"
@@ -190,19 +190,6 @@ class Display:
             coordinates,
             text,
             font=self.medium_font,
-            fill=Display.TEXT_COLOR,
-        )
-
-        if hasattr(self.medium_font, "getsize"):
-            (co_width, _) = self.medium_font.getsize(co_text)
-        else:
-            co_width = self.medium_font.getbbox(co_text)[2]
-        coordinates = (co_width, current_height - 10)
-        logger.debug(f"'2' coordinates = {coordinates}")
-        self.draw.text(
-            coordinates,
-            "2",
-            font=self.small_font,
             fill=Display.TEXT_COLOR,
         )
 

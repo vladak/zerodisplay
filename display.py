@@ -1,262 +1,130 @@
 """
 display class
-
-Not dependent on the output type.
 """
 
 import logging
-from datetime import datetime
 
-from PIL import Image, ImageDraw, ImageFont
-from prometheus_api_client import (
-    MetricsList,
-    PrometheusApiClientException,
-    PrometheusConnect,
-)
+try:
+    import board
+    import busio
+    import digitalio
+except NotImplementedError as exc:
+    print(f"Will only support running with -o: {exc}")
+
+try:
+    from adafruit_epd.ssd1680 import Adafruit_SSD1680
+except ImportError:
+    pass
+
+try:
+    from inky.auto import auto
+except ImportError:
+    pass
 
 
-# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-few-public-methods
 class Display:
     """
-    Class to wrap fetching and drawing of the metrics.
+    class to wrap the eInk display
     """
 
-    # First define some color constants
-    WHITE = (0xFF, 0xFF, 0xFF)
-    BLACK = (0x00, 0x00, 0x00)
-
-    # Next define some constants to allow easy resizing of shapes and colors
-    BACKGROUND_COLOR = WHITE
-    FOREGROUND_COLOR = WHITE
-    TEXT_COLOR = BLACK
-
-    # pylint: disable=too-many-arguments
-    def __init__(
-        self,
-        url,
-        display_width,
-        display_height,
-        medium_font_path,
-        large_font_path,
-        temp_sensor_name,
-    ):
+    def __init__(self, display, width, height):
         """
-        :param url: URL to retrieve the metrics from
-        :param display_height: display width in pixels
-        :param display_width: display height in pixels
-        :param large_font_path: path to font used for large letters
-        :param medium_font_path: path to font used for medium letters
-        :param temp_sensor_name: temperature sensor name
+        initialize
         """
-        self.url = url
-        self.display_width = display_width
-        self.display_height = display_height
+        self.display = display
+        self.width = width
+        self.height = height
 
-        self.small_font = ImageFont.truetype(large_font_path, 12)
-        self.medium_font = ImageFont.truetype(medium_font_path, 24)
-        self.large_font = ImageFont.truetype(large_font_path, 64)
-
-        self.temp_sensor_name = temp_sensor_name
-
-        self.image = Image.new("RGB", (self.display_width, self.display_height))
-
-        # Get drawing object to draw on image.
-        self.draw = ImageDraw.Draw(self.image)
-
-        self.prometheus_connect = PrometheusConnect(url=url)
-
-    def extract_metric_from_data(self, data):
+    def update(self, image):
         """
-        Given JSON string, extract metric value and return as string
-        :param data:
+        Display image.
+        :param display: Display object
+        :param image:
         :return:
         """
-        temp_list = MetricsList(data)
-        metric = temp_list[0]
-        return str(metric.metric_values.y[0])
 
-    def get_metrics(self):
+
+# pylint: disable=too-few-public-methods
+class AdafruitDisplay(Display):
+    """
+    class to wrap the Adafruit eInk display
+    """
+
+    def update(self, image):
         """
-        Retrieve metrics from given URL and return them. If a metric cannot be retrieved,
-        None is used instead.
-        :return: tuple of temperature, CO2, atmospheric pressure (as strings)
-        """
-        temp = None
-        co2 = None
-        pressure = None
-
-        logger = logging.getLogger(__name__)
-
-        try:
-            temp_data = self.prometheus_connect.custom_query(
-                # pylint: disable=consider-using-f-string
-                "last_over_time(temperature{sensor='%s'}[30m])"
-                % self.temp_sensor_name
-            )
-            temp = self.extract_metric_from_data(temp_data)
-        except (PrometheusApiClientException, IndexError) as req_exc:
-            logger.error(f"cannot get data for temperature from {self.url}: {req_exc}")
-
-        try:
-            co2_data = self.prometheus_connect.get_current_metric_value(
-                metric_name="co2_ppm"
-            )
-            co2 = self.extract_metric_from_data(co2_data)
-        except (PrometheusApiClientException, IndexError) as req_exc:
-            logger.error(f"cannot get data for CO2 from {self.url}: {req_exc}")
-
-        try:
-            pressure_data = self.prometheus_connect.get_current_metric_value(
-                metric_name="pressure_hpa{name='sea'}"
-            )
-            pressure = self.extract_metric_from_data(pressure_data)
-        except (PrometheusApiClientException, IndexError) as req_exc:
-            logger.error(
-                f"cannot get data for barometric pressure from {self.url}: {req_exc}"
-            )
-
-        return temp, co2, pressure
-
-    def draw_image(self):
-        """
-        Refresh the display with weather metrics retrieved from the URL
-        :return PIL image instance
-        """
-
-        temp, co2, pressure = self.get_metrics()
-
-        # Draw a filled box as the background
-        self.draw.rectangle(
-            (0, 0, self.display_width - 1, self.display_height - 1),
-            fill=Display.BACKGROUND_COLOR,
-        )
-
-        self.draw_date_time()
-
-        text_height = self.draw_outside_temperature(temp)
-        current_height = self.draw_co2(co2, text_height)
-        self.draw_pressure(current_height, pressure)
-
-        return self.image
-
-    def draw_pressure(self, current_height, pressure):
-        """
-        :param current_height:
-        :param pressure:
+        Display image.
+        :param image: image to display
         :return:
         """
         logger = logging.getLogger(__name__)
 
-        # Display atmospheric pressure level.
-        if pressure:
-            pressure = int(float(pressure))
-            text = f"Pressure: {pressure} hPa"
-        else:
-            text = "Pressure: N/A"
-        logger.debug(text)
-        coordinates = (0, current_height)  # use previous text height
-        logger.debug(f"coordinates = {coordinates}")
-        self.draw.text(
-            coordinates,
-            text,
-            font=self.medium_font,
-            fill=Display.TEXT_COLOR,
-        )
+        logger.debug("display in progress")
+        self.display.image(image)
+        self.display.display()
+        logger.debug("display done")
 
-    def draw_co2(self, co2, text_height):
+
+# pylint: disable=too-few-public-methods
+class InkyDisplay(Display):
+    """
+    class to wrap the Pimoroni pHAT eInk display
+    """
+
+    def update(self, image):
         """
-        :param co2:
-        :param text_height:
-        :return: current text height
+        Display image.
+        :param image: image to display
+        :return:
         """
         logger = logging.getLogger(__name__)
 
-        # Display CO2 level.
-        co_text = "CO₂"
-        if co2:
-            co2 = int(float(co2))
-            text = f"{co_text} : {co2} ppm"
-        else:
-            text = f"{co_text} : N/A"
-        coordinates = (0, text_height + 10)  # use previous text height
-        current_height = text_height + 10
-        if hasattr(self.medium_font, "getsize"):
-            (_, text_height) = self.medium_font.getsize(text)
-        else:
-            text_height = self.medium_font.getbbox(text)[3]
-        current_height = current_height + text_height
-        logger.debug(f"'{text}' coordinates = {coordinates}")
-        self.draw.text(
-            coordinates,
-            text,
-            font=self.medium_font,
-            fill=Display.TEXT_COLOR,
+        logger.debug("display in progress")
+        self.display.set_image(image)
+        self.display.show()
+        logger.debug("display done")
+
+
+def get_e_ink_display():
+    """
+    :return: Display instance
+    """
+    logger = logging.getLogger(__name__)
+
+    try:
+        # Create the SPI device and pins we will need.
+        spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
+        ecs = digitalio.DigitalInOut(board.CE0)
+        # pylint: disable=invalid-name
+        dc = digitalio.DigitalInOut(board.D22)
+        rst = digitalio.DigitalInOut(board.D27)
+        busy = digitalio.DigitalInOut(board.D17)
+
+        # 2.13" HD Tri-color or mono display
+        display_height = 122
+        display_width = 250
+
+        display = Adafruit_SSD1680(
+            display_height,
+            display_width,
+            spi,
+            cs_pin=ecs,
+            dc_pin=dc,
+            sramcs_pin=None,
+            rst_pin=rst,
+            busy_pin=busy,
         )
 
-        return current_height
+        display.rotation = 1
+        logger.info("Detected Adafruit SSD1680 display")
+        return AdafruitDisplay(display, display_width, display_height)
+    except Exception:
+        pass
 
-    def draw_outside_temperature(self, temp):
-        """
-        :param temp: temperature value
-        :return: current text height
-        """
-        logger = logging.getLogger(__name__)
-
-        # Display outside temperature.
-        if temp:
-            outside_temp = int(float(temp))
-            text = f"{outside_temp}°C"
-        else:
-            text = "N/A"
-        logger.debug(text)
-        if hasattr(self.medium_font, "getsize"):
-            (text_width, text_height) = self.large_font.getsize(text)
-        else:
-            (text_width, text_height) = self.large_font.getbbox(text)[2:4]
-        logger.debug(f"text width={text_width}, height={text_height}")
-        logger.debug(
-            f"display width={self.display_width}, height={self.display_height}"
-        )
-        coordinates = (0, 0)
-        logger.debug(f"coordinates = {coordinates}")
-        self.draw.text(
-            coordinates,
-            text,
-            font=self.large_font,
-            fill=Display.TEXT_COLOR,
-        )
-        return text_height
-
-    def draw_date_time(self):
-        """
-        Draw date and time in the top right corner.
-        """
-        logger = logging.getLogger(__name__)
-
-        # Display time.
-        now = datetime.now()
-        text = now.strftime(f"{now.hour}:%M")
-        logger.debug(text)
-        if hasattr(self.medium_font, "getsize"):
-            (text_width, text_height) = self.medium_font.getsize(text)
-        else:
-            (text_width, text_height) = self.medium_font.getbbox(text)[2:4]
-        coordinates = (self.display_width - text_width - 10, 0)
-        logger.debug(f"coordinates = {coordinates}")
-        self.draw.text(
-            coordinates,
-            text,
-            font=self.medium_font,
-            fill=Display.TEXT_COLOR,
-        )
-        # Display date underneath the time.
-        text = now.strftime(f"{now.day}.{now.month}.")
-        logger.debug(text)
-        coordinates = (self.display_width - text_width - 10, text_height + 5)
-        logger.debug(f"coordinates = {coordinates}")
-        self.draw.text(
-            coordinates,
-            text,
-            font=self.medium_font,
-            fill=Display.TEXT_COLOR,
-        )
+    # Fall back to Pimoroni pHAT.
+    try:
+        display = auto()
+        logger.info("Detected Pimoroni pHAT")
+        return InkyDisplay(display, display.resolution[0], display.resolution[1])
+    except Exception:
+        return None

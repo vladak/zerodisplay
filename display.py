@@ -1,5 +1,5 @@
 """
-display class
+display classes
 """
 
 import logging
@@ -11,15 +11,8 @@ try:
 except NotImplementedError as exc:
     print(f"Will only support running with -o: {exc}")
 
-try:
-    from adafruit_epd.ssd1680 import Adafruit_SSD1680
-except ImportError:
-    pass
-
-try:
-    from inky.auto import auto
-except ImportError:
-    pass
+from adafruit_epd.ssd1680 import Adafruit_SSD1680
+from inky.auto import auto
 
 
 # pylint: disable=too-few-public-methods

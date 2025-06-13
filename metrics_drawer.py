@@ -30,7 +30,7 @@ class MetricsDrawer:
     FOREGROUND_COLOR = WHITE
     TEXT_COLOR = BLACK
 
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments,too-many-positional-arguments
     def __init__(
         self,
         url,

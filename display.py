@@ -119,5 +119,6 @@ def get_e_ink_display():
         display = auto()
         logger.info("Detected Pimoroni pHAT")
         return InkyDisplay(display, display.resolution[0], display.resolution[1])
-    except Exception:
+    except RuntimeError as e:
+        logger.error("cannot initialize inky pHAT: {e}")
         return None

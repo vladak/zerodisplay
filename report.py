@@ -96,10 +96,12 @@ def main():
         image.save(args.output)
         return
 
+    logger.debug("Getting display")
     e_display = get_e_ink_display()
     if e_display is None:
         logger.error("No display detected")
         sys.exit(1)
+    logger.debug(f"Got e-display: {e_display.display}")
     drawer = MetricsDrawer(
         args.url,
         e_display.width,
@@ -109,6 +111,7 @@ def main():
         args.temp_sensor_name,
     )
     while True:
+        logger.debug("Drawing image")
         image = drawer.draw_image()
         e_display.update(image)
         time.sleep(args.timeout)

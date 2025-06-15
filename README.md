@@ -7,7 +7,7 @@ The goal of this tiny project is to display outside temperature and a few other 
 ## Hardware
 
 - [Raspberry Pi Zero WH](https://www.adafruit.com/product/3708)
-- ~[Adafruit 2.13" Monochrome E-Ink Bonnet](https://www.adafruit.com/product/4687)~ [Pimoroni Inky pHAT - eInk Display - Black/White](https://www.adafruit.com/product/393)
+- ~[Adafruit 2.13" Monochrome E-Ink Bonnet](https://www.adafruit.com/product/4687)~ [Pimoroni Inky pHAT - eInk Display - Black/White](https://www.adafruit.com/product/3934)
 - Apple Magic mouse.. wait for it.. transparent enclosure
 - a nice drawing
 
@@ -69,4 +69,4 @@ ARGS=-U http://localhost:8111 -l debug --temp_sensor_name foo/bar
 # Links
 
 - https://learn.adafruit.com/2-13-in-e-ink-bonnet/usage
-
+- https://learn.pimoroni.com/article/getting-started-with-inky-phat

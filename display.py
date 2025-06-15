@@ -111,7 +111,7 @@ def get_e_ink_display():
         display.rotation = 1
         logger.info("Detected Adafruit SSD1680 display")
         return AdafruitDisplay(display, display_width, display_height)
-    except Exception:
+    except Exception:  # pylint: disable=broad-exception-caught
         pass
 
     # Fall back to Pimoroni pHAT.

@@ -7,7 +7,7 @@ The goal of this tiny project is to display outside temperature and a few other 
 ## Hardware
 
 - [Raspberry Pi Zero WH](https://www.adafruit.com/product/3708)
-- [Adafruit 2.13" Monochrome E-Ink Bonnet](https://www.adafruit.com/product/4687)
+- ~[Adafruit 2.13" Monochrome E-Ink Bonnet](https://www.adafruit.com/product/4687)~ [Pimoroni Inky pHAT - eInk Display - Black/White](https://www.adafruit.com/product/393)
 - Apple Magic mouse.. wait for it.. transparent enclosure
 - a nice drawing
 

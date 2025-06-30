@@ -35,6 +35,7 @@ sudo raspi-config
   sudo apt-get install -y fonts-dejavu
   sudo apt-get install -y libopenjp2-7 # needed for Pillow
   sudo apt-get install -y libatlas-base-dev # needed for numpy used by prometheus-api-client
+  sudo apt-get install -y libjpeg9 # to build Pillow wheel
 ```
 - checkout the Git repository
 ```

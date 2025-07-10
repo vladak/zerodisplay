@@ -2,7 +2,11 @@
 
 # zerodisplay
 
-The goal of this tiny project is to display outside temperature and a few other metrics (CO2, atmospheric pressure) on a display attached to a fridge. This assume this data is already collected elsewhere and available via HTTP. Specifically this assumes https://github.com/vladak/weather.
+The goal of this tiny project is to display outside temperature and a few other
+metrics (CO2, atmospheric pressure) on a display attached to a fridge. This
+assume this data is already collected elsewhere and available via MQTT.
+Specifically this assumes https://github.com/vladak/weather and
+https://github.com/vladak/shield with https://github.com/vladak/radio2mqtt.
 
 ## Hardware
 
@@ -34,7 +38,6 @@ sudo raspi-config
   sudo apt-get install -y python3-venv
   sudo apt-get install -y fonts-dejavu
   sudo apt-get install -y libopenjp2-7 # needed for Pillow
-  sudo apt-get install -y libatlas-base-dev # needed for numpy used by prometheus-api-client
   sudo apt-get install -y libjpeg9 # to build Pillow wheel
 ```
 - checkout the Git repository
@@ -56,7 +59,7 @@ sudo raspi-config
   - `ARGS`: arguments to the `report` program
   - the file can look like this (no double quotes):
 ```
-ARGS=-U http://localhost:8111 -l debug --temp_sensor_name foo/bar
+ARGS=--hostname mqtt_broker -l debug --temp_sensor_topic devices/terasa/shield --temp_sensor_name temperature --co2_sensor_topic devices/kuchyne/pi --co2_sensor_name co2_ppm --pressure_sensor_topic devices/kuchyne/pi --pressure_sensor_name pressure
 ```
 - enable+start the service
 ```

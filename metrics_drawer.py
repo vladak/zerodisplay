@@ -8,11 +8,6 @@ import logging
 from datetime import datetime
 
 from PIL import Image, ImageDraw, ImageFont
-from prometheus_api_client import (
-    MetricsList,
-    PrometheusApiClientException,
-    PrometheusConnect,
-)
 
 
 # pylint: disable=too-many-instance-attributes
@@ -33,22 +28,17 @@ class MetricsDrawer:
     # pylint: disable=too-many-arguments,too-many-positional-arguments
     def __init__(
         self,
-        url,
         display_width,
         display_height,
         medium_font_path,
         large_font_path,
-        temp_sensor_name,
     ):
         """
-        :param url: URL to retrieve the metrics from
         :param display_height: display width in pixels
         :param display_width: display height in pixels
         :param large_font_path: path to font used for large letters
         :param medium_font_path: path to font used for medium letters
-        :param temp_sensor_name: temperature sensor name
         """
-        self.url = url
         self.display_width = display_width
         self.display_height = display_height
 
@@ -56,74 +46,17 @@ class MetricsDrawer:
         self.medium_font = ImageFont.truetype(medium_font_path, 24)
         self.large_font = ImageFont.truetype(large_font_path, 64)
 
-        self.temp_sensor_name = temp_sensor_name
-
         self.image = Image.new("RGB", (self.display_width, self.display_height))
 
         # Get drawing object to draw on image.
         self.draw = ImageDraw.Draw(self.image)
 
-        self.prometheus_connect = PrometheusConnect(url=url)
-
-    def extract_metric_from_data(self, data):
+    def draw_image(self, temp, co2, pressure):
         """
-        Given JSON string, extract metric value and return as string
-        :param data:
-        :return:
-        """
-        temp_list = MetricsList(data)
-        metric = temp_list[0]
-        return str(metric.metric_values.y[0])
-
-    def get_metrics(self):
-        """
-        Retrieve metrics from given URL and return them. If a metric cannot be retrieved,
-        None is used instead.
-        :return: tuple of temperature, CO2, atmospheric pressure (as strings)
-        """
-        temp = None
-        co2 = None
-        pressure = None
-
-        logger = logging.getLogger(__name__)
-
-        try:
-            temp_data = self.prometheus_connect.custom_query(
-                # pylint: disable=consider-using-f-string
-                "last_over_time(temperature{sensor='%s'}[30m])"
-                % self.temp_sensor_name
-            )
-            temp = self.extract_metric_from_data(temp_data)
-        except (PrometheusApiClientException, IndexError) as req_exc:
-            logger.error(f"cannot get data for temperature from {self.url}: {req_exc}")
-
-        try:
-            co2_data = self.prometheus_connect.get_current_metric_value(
-                metric_name="co2_ppm"
-            )
-            co2 = self.extract_metric_from_data(co2_data)
-        except (PrometheusApiClientException, IndexError) as req_exc:
-            logger.error(f"cannot get data for CO2 from {self.url}: {req_exc}")
-
-        try:
-            pressure_data = self.prometheus_connect.get_current_metric_value(
-                metric_name="pressure_hpa{name='sea'}"
-            )
-            pressure = self.extract_metric_from_data(pressure_data)
-        except (PrometheusApiClientException, IndexError) as req_exc:
-            logger.error(
-                f"cannot get data for barometric pressure from {self.url}: {req_exc}"
-            )
-
-        return temp, co2, pressure
-
-    def draw_image(self):
-        """
-        Refresh the display with weather metrics retrieved from the URL
+        Refresh the display with weather metrics from the positonal arguments
+        (temperature, co2 and barometric pressure).
         :return PIL image instance
         """
-
-        temp, co2, pressure = self.get_metrics()
 
         # Draw a filled box as the background
         self.draw.rectangle(
@@ -204,7 +137,7 @@ class MetricsDrawer:
 
         # Draw outside temperature.
         if temp:
-            outside_temp = int(float(temp))
+            outside_temp = int(temp)
             text = f"{outside_temp}°C"
         else:
             text = "N/A"

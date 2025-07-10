@@ -11,6 +11,7 @@ import time
 
 from display import get_e_ink_display
 from logutil import LogLevelAction
+from metrics import Metrics
 from metrics_drawer import MetricsDrawer
 
 
@@ -22,6 +23,11 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description="Update eInk paper display with weather metrics",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument(
+        "--hostname",
+        help="MQTT broker hostname",
+        required=True,
     )
     parser.add_argument(
         "-l",
@@ -37,12 +43,6 @@ def parse_args():
         default=120,
     )
     parser.add_argument(
-        "-U",
-        "--url",
-        help="URL to query for metrics via Prometheus API",
-        default="http://weather:9090",
-    )
-    parser.add_argument(
         "-o",
         "--output",
         help="Instead of updating the display, print the image to a JPG file",
@@ -54,15 +54,45 @@ def parse_args():
         default="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
     )
     parser.add_argument(
+        "-p",
+        "--port",
+        help="MQTT broker port",
+        default=1883,
+    )
+    parser.add_argument(
         "-L",
         "--large_font",
         help="Large font path",
         default="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
     )
     parser.add_argument(
-        "-T",
+        "--temp_sensor_topic",
+        help="Temperature sensor MQTT topic",
+        required=True,
+    )
+    parser.add_argument(
         "--temp_sensor_name",
-        help="Temperature sensor name",
+        help="Temperature sensor MQTT name",
+        required=True,
+    )
+    parser.add_argument(
+        "--co2_sensor_topic",
+        help="CO2 sensor MQTT topic",
+        required=True,
+    )
+    parser.add_argument(
+        "--co2_sensor_name",
+        help="CO2 sensor MQTT name",
+        required=True,
+    )
+    parser.add_argument(
+        "--pressure_sensor_topic",
+        help="Barometric pressure sensor MQTT topic",
+        required=True,
+    )
+    parser.add_argument(
+        "--pressure_sensor_name",
+        help="Barometric pressure sensor MQTT name",
         required=True,
     )
 
@@ -83,16 +113,36 @@ def main():
     display_height = 122
     display_width = 250
 
+    metrics = Metrics(
+        args.hostname,
+        args.port,
+        args.temp_sensor_topic,
+        args.temp_sensor_name,
+        args.co2_sensor_topic,
+        args.co2_sensor_name,
+        args.pressure_sensor_topic,
+        args.pressure_sensor_name,
+    )
+
     drawer = MetricsDrawer(
-        args.url,
         display_width,
         display_height,
         args.medium_font,
         args.large_font,
-        args.temp_sensor_name,
     )
     if args.output:
-        image = drawer.draw_image()
+        # Wait for metrics to become available.
+        logger.info("Waiting for metrics")
+        for _ in range(0, args.timeout):
+            data = metrics.get_metrics()
+            logger.debug(f"Metrics: {data}")
+            if all(data):
+                break
+            time.sleep(1)
+        if None in data:
+            logger.warning("Some metrics missing")
+
+        image = drawer.draw_image(*data)
         image.save(args.output)
         return
 
@@ -103,17 +153,18 @@ def main():
         sys.exit(1)
     logger.debug(f"Got e-display: {e_display.display}")
     drawer = MetricsDrawer(
-        args.url,
         e_display.width,
         e_display.height,
         args.medium_font,
         args.large_font,
-        args.temp_sensor_name,
     )
     while True:
+        data = metrics.get_metrics()
+        logger.debug(f"Metrics: {data}")
         logger.debug("Drawing image")
-        image = drawer.draw_image()
+        image = drawer.draw_image(*data)
         e_display.update(image)
+        logger.debug(f"Sleeping for {args.timeout} seconds")
         time.sleep(args.timeout)
 
 

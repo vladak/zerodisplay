@@ -59,7 +59,7 @@ sudo raspi-config
   - `ARGS`: arguments to the `report` program
   - the file can look like this (no double quotes):
 ```
-ARGS=--hostname mqtt_broker -l debug --temp_sensor_topic devices/terasa/shield --temp_sensor_name temperature --co2_sensor_topic devices/kuchyne/pi --co2_sensor_name co2_ppm --pressure_sensor_topic devices/kuchyne/pi --pressure_sensor_name pressure
+ARGS=--hostname mqtt_broker -l debug --temp_sensor_topic devices/terasa/shield --temp_sensor_name temperature --co2_sensor_topic devices/kuchyne/pi --co2_sensor_name co2_ppm --pressure_sensor_topic devices/kuchyne/pi --pressure_sensor_name pressure_hpa
 ```
 - enable+start the service
 ```

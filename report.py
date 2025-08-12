@@ -15,6 +15,30 @@ from metrics import Metrics
 from metrics_drawer import MetricsDrawer
 
 
+class TimeoutAction(argparse.Action):
+    """
+    handle the timeout argument, enforcing minimum value.
+    """
+
+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        """
+        initialize. do not allow nargs.
+        """
+        if nargs is not None:
+            raise ValueError("nargs not allowed")
+        super().__init__(option_strings, dest, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        """
+        set value. enforce minimum timeout.
+        """
+        logger = logging.getLogger(__name__)
+        logger.debug(f"{namespace}, {values}, {option_string}")
+        if values < 180:
+            raise ValueError("timeout must be bigger than 180")
+        setattr(namespace, self.dest, values)
+
+
 def parse_args():
     """
     Parse command line arguments
@@ -42,6 +66,7 @@ def parse_args():
         help="Timeout in seconds to sleep between updating the display",
         default=900,
         type=int,
+        action=TimeoutAction,
     )
     parser.add_argument(
         "-o",

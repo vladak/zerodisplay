@@ -74,3 +74,7 @@ ARGS=--hostname mqtt_broker -l debug --temp_sensor_topic devices/terasa/shield -
 
 - https://learn.adafruit.com/2-13-in-e-ink-bonnet/usage
 - https://learn.pimoroni.com/article/getting-started-with-inky-phat
+
+# Lessons learned
+
+- display rate lower than 180 seconds will wash out the eink display rather quickly

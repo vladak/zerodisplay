@@ -40,7 +40,7 @@ def parse_args():
         "-t",
         "--timeout",
         help="Timeout in seconds to sleep between updating the display",
-        default=300,
+        default=900,
     )
     parser.add_argument(
         "-o",

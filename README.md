@@ -79,3 +79,4 @@ ARGS=--hostname mqtt_broker -l debug --temp_sensor_topic devices/terasa/shield -
 
 - display rate lower than 180 seconds will wash out the eink display rather quickly
   - details on https://forums.adafruit.com/viewtopic.php?p=1063797#p1063797
+- too hot environment can accelerate ghosting

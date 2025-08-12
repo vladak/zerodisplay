@@ -41,6 +41,7 @@ def parse_args():
         "--timeout",
         help="Timeout in seconds to sleep between updating the display",
         default=900,
+        type=int,
     )
     parser.add_argument(
         "-o",

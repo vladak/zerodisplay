@@ -78,5 +78,8 @@ ARGS=--hostname mqtt_broker -l debug --temp_sensor_topic devices/terasa/shield -
 # Lessons learned
 
 - display rate lower than 180 seconds will wash out the eink display rather quickly
+  - Safe         | ≥ 3 min (180 s)     | Minimum to avoid rapid degradation   |
+  - Better       | 5–10 min            | Extends panel life noticeably        |
+  - Gentle       | 15+ min or on-change| Ideal for mostly static displays 
   - details on https://forums.adafruit.com/viewtopic.php?p=1063797#p1063797
 - too hot environment can accelerate ghosting

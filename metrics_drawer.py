@@ -166,26 +166,15 @@ class MetricsDrawer:
         """
         logger = logging.getLogger(__name__)
 
-        # Draw time.
+        # Draw date.
         now = datetime.now()
-        text = now.strftime(f"{now.hour}:%M")
-        logger.debug(text)
-        if hasattr(self.medium_font, "getsize"):
-            (text_width, text_height) = self.medium_font.getsize(text)
-        else:
-            (text_width, text_height) = self.medium_font.getbbox(text)[2:4]
-        coordinates = (self.display_width - text_width - 10, 0)
-        logger.debug(f"coordinates = {coordinates}")
-        self.draw.text(
-            coordinates,
-            text,
-            font=self.medium_font,
-            fill=MetricsDrawer.TEXT_COLOR,
-        )
-        # Draw date underneath the time.
         text = now.strftime(f"{now.day}.{now.month}.")
         logger.debug(text)
-        coordinates = (self.display_width - text_width - 10, text_height + 5)
+        if hasattr(self.medium_font, "getsize"):
+            (text_width, _) = self.medium_font.getsize(text)
+        else:
+            (text_width, _) = self.medium_font.getbbox(text)[2:4]
+        coordinates = (self.display_width - text_width - 10, 0)
         logger.debug(f"coordinates = {coordinates}")
         self.draw.text(
             coordinates,

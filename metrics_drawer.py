@@ -174,7 +174,7 @@ class MetricsDrawer:
             (text_width, _) = self.medium_font.getsize(text)
         else:
             (text_width, _) = self.medium_font.getbbox(text)[2:4]
-        coordinates = (self.display_width - text_width - 10, 0)
+        coordinates = (self.display_width - text_width - 10, 10)
         logger.debug(f"coordinates = {coordinates}")
         self.draw.text(
             coordinates,

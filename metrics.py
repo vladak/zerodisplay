@@ -110,16 +110,18 @@ class Metrics:
             self.logger.warning(f"Got MQTT exception: {e}")
             self.mqtt.reconnect()
 
-        time_threshold = time.monotonic() - self.metric_timeout
-        if self.temp_ts is not None and self.temp_ts < time_threshold:
-            self.logger.warning("temp updated before time threshold")
-            self.temp_value = None
-        if self.co2_ts is not None and self.co2_ts < time_threshold:
-            self.logger.warning("co2 updated before time threshold")
-            self.co2_value = None
-        if self.pressure_ts is not None and self.pressure_ts < time_threshold:
-            self.logger.warning("pressure updated before time threshold")
-            self.pressure_value = None
+        now = time.monotonic()
+        if now > self.metric_timeout:
+            time_threshold = now - self.metric_timeout
+            if self.temp_ts is not None and self.temp_ts < time_threshold:
+                self.logger.warning("temp updated before time threshold")
+                self.temp_value = None
+            if self.co2_ts is not None and self.co2_ts < time_threshold:
+                self.logger.warning("co2 updated before time threshold")
+                self.co2_value = None
+            if self.pressure_ts is not None and self.pressure_ts < time_threshold:
+                self.logger.warning("pressure updated before time threshold")
+                self.pressure_value = None
 
         self.logger.debug(f"temp = {self.temp_value}")
         self.logger.debug(f"co2 = {self.co2_value}")

@@ -175,7 +175,7 @@ def main():
             break
         time.sleep(1)
     if None in data:
-        logger.warning("Some metrics missing")
+        logger.warning(f"Some metrics are missing: {data}")
 
     if args.output:
         image = drawer.draw_image(*data)
@@ -194,14 +194,19 @@ def main():
         args.medium_font,
         args.large_font,
     )
+    redraw_ts = 0
     while True:
         data = metrics.get_metrics()
         logger.debug(f"Metrics: {data}")
-        logger.debug("Drawing image")
-        image = drawer.draw_image(*data)
-        e_display.update(image)
+        now = time.monotonic()
+        if redraw_ts == 0 or now - redraw_ts > args.timeout:
+            logger.info("Drawing image")
+            image = drawer.draw_image(*data)
+            e_display.update(image)
+            redraw_ts = now
+
         logger.debug(f"Sleeping for {args.timeout} seconds")
-        time.sleep(args.timeout)
+        time.sleep(1)
 
 
 if __name__ == "__main__":

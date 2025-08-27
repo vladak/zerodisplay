@@ -163,18 +163,21 @@ def main():
         args.medium_font,
         args.large_font,
     )
-    if args.output:
-        # Wait for metrics to become available.
-        logger.info("Waiting for metrics")
-        for _ in range(0, args.timeout):
-            data = metrics.get_metrics()
-            logger.debug(f"Metrics: {data}")
-            if all(data):
-                break
-            time.sleep(1)
-        if None in data:
-            logger.warning("Some metrics missing")
+    #
+    # Wait for the metrics to become available.
+    # Repurpose the refresh timeout for this.
+    #
+    logger.info("Waiting for the metrics")
+    for _ in range(0, args.timeout):
+        data = metrics.get_metrics()
+        logger.debug(f"Metrics: {data}")
+        if all(data):
+            break
+        time.sleep(1)
+    if None in data:
+        logger.warning("Some metrics missing")
 
+    if args.output:
         image = drawer.draw_image(*data)
         image.save(args.output)
         return

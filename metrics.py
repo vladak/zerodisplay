@@ -6,6 +6,7 @@ import json
 import logging
 import socket
 import ssl
+import time
 
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_minimqtt.adafruit_minimqtt import MMQTTException
@@ -28,10 +29,13 @@ def message_handler(client, topic, message):
     payload_dict = json.loads(message)
     if topic == metrics.temp_topic:
         metrics.temp_value = payload_dict.get(metrics.temp_name)
+        metrics.temp_ts = time.monotonic()
     if topic == metrics.co2_topic:
         metrics.co2_value = payload_dict.get(metrics.co2_name)
+        metrics.co2_ts = time.monotonic()
     if topic == metrics.pressure_topic:
         metrics.pressure_value = payload_dict.get(metrics.pressure_name)
+        metrics.pressure_ts = time.monotonic()
 
 
 # pylint: disable=too-few-public-methods
@@ -45,6 +49,7 @@ class Metrics:
         self,
         hostname,
         port,
+        metric_timeout,
         temp_topic,
         temp_name,
         co2_topic,
@@ -68,6 +73,8 @@ class Metrics:
         self.logger.info(f"Connecting to MQTT broker {hostname} on port {port}")
         self.mqtt.connect()
 
+        self.metric_timeout = metric_timeout
+
         self.temp_topic = temp_topic
         self.temp_name = temp_name
         self.co2_topic = co2_topic
@@ -75,9 +82,13 @@ class Metrics:
         self.pressure_topic = pressure_topic
         self.pressure_name = pressure_name
 
+        # The stored values and timestamps of their last update.
         self.temp_value = None
+        self.temp_ts = None
         self.co2_value = None
+        self.co2_ts = None
         self.pressure_value = None
+        self.pressure_ts = None
 
         self.mqtt.on_message = message_handler
         topics = [(temp_topic, 0), (co2_topic, 0), (pressure_topic, 0)]
@@ -98,6 +109,17 @@ class Metrics:
         except MMQTTException as e:
             self.logger.warning(f"Got MQTT exception: {e}")
             self.mqtt.reconnect()
+
+        time_threshold = time.monotonic() - self.metric_timeout
+        if self.temp_ts is not None and self.temp_ts < time_threshold:
+            self.logger.warning("temp updated before time threshold")
+            self.temp_value = None
+        if self.co2_ts is not None and self.co2_ts < time_threshold:
+            self.logger.warning("co2 updated before time threshold")
+            self.co2_value = None
+        if self.pressure_ts is not None and self.pressure_ts < time_threshold:
+            self.logger.warning("pressure updated before time threshold")
+            self.pressure_value = None
 
         self.logger.debug(f"temp = {self.temp_value}")
         self.logger.debug(f"co2 = {self.co2_value}")

@@ -69,6 +69,12 @@ def parse_args():
         action=TimeoutAction,
     )
     parser.add_argument(
+        "--metric_timeout",
+        help="Timeout in seconds to consider metrics stale",
+        default=1800,
+        type=int,
+    )
+    parser.add_argument(
         "-o",
         "--output",
         help="Instead of updating the display, print the image to a JPG file",
@@ -142,6 +148,7 @@ def main():
     metrics = Metrics(
         args.hostname,
         args.port,
+        args.metric_timeout,
         args.temp_sensor_topic,
         args.temp_sensor_name,
         args.co2_sensor_topic,

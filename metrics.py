@@ -110,6 +110,10 @@ class Metrics:
             self.logger.warning(f"Got MQTT exception: {e}")
             self.mqtt.reconnect()
 
+        #
+        # If some of the metrics has not been updated for certain time,
+        # consider it not available to avoid presenting stale values.
+        #
         now = time.monotonic()
         if now > self.metric_timeout:
             time_threshold = now - self.metric_timeout

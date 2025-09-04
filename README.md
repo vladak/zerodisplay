@@ -17,7 +17,7 @@ https://github.com/vladak/shield with https://github.com/vladak/radio2mqtt.
 
 It looks like this: ![Magic enclosure](/magic_enclosure.jpg)
 
-The buttons on the Adafruit were left unused. I considered drilling the holes for them one day, in order to be able to switch to e.g. a name-of-the-day display. Similarly, if the Pi tends to overheat, will have to drill some holes to the top of the enclosure. Over the time (3 years or so) the original Adafruit display become dimmer, up to the point when it was a bit hard to read from distance, so I replaced it with the Pimoroni inky pHAT. The same driver can be used to drive it and it has the same resolution, so it was just a matter of swapping it. The Pimoroni display has to STEMMA QT connector or buttons, which I did not used anyway.
+The buttons on the Adafruit were left unused. I considered drilling the holes for them one day, in order to be able to switch to e.g. a name-of-the-day display. Similarly, if the Pi tends to overheat, will have to drill some holes to the top of the enclosure. Over the time (3 years or so) the original Adafruit display become dimmer, up to the point when it was a bit hard to read from distance, so I replaced it with the Pimoroni inky pHAT. The same driver can be used to drive it and it has the same resolution, so it was just a matter of swapping it. The Pimoroni display has to STEMMA QT connector or buttons, which I did not use anyway.
 
 ## Install
 

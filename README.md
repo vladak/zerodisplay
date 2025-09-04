@@ -77,5 +77,6 @@ ARGS=--hostname mqtt_broker -l debug --temp_sensor_topic devices/terasa/shield -
 
 # Lessons learned
 
-- display rate lower than 180 seconds will wash out the eink display rather quickly, used 15 minutes by default
+- display rate lower than 180 seconds will wash out the eink display rather quickly
+  - used 15 minutes by default, 20 minutes "in production"
 - too hot environment can accelerate ghosting

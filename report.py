@@ -10,6 +10,7 @@ import time
 
 from cli import parse_args
 from display import get_e_ink_display
+from loop_cond import CondInfinite, FormalCondInterface
 from metrics import Metrics
 from metrics_drawer import MetricsDrawer
 
@@ -78,19 +79,36 @@ def main():
         args.medium_font,
         args.large_font,
     )
+
+    loop(CondInfinite(), args.timeout, drawer, e_display, metrics)
+
+
+def loop(cond, timeout, drawer, e_display, metrics):
+    """
+    infinite loop that retrieves the metrics and updates the display.
+    :param cond: object implementing FormalCondInterface
+    :param timeout: timeout in seconds
+    :param drawer: MetricsDrawer object
+    :param e_display: display object
+    :param metrics: Metrics object
+    """
+    logger = logging.getLogger(__name__)
+
+    assert isinstance(cond, FormalCondInterface)
+
     redraw_ts = 0
-    while True:
+    while cond.cond():
         data = metrics.get_metrics()
         logger.debug(f"Metrics: {data}")
         now = time.monotonic()
-        if redraw_ts == 0 or now - redraw_ts > args.timeout:
+        if redraw_ts == 0 or now - redraw_ts > timeout:
             logger.info("Drawing image")
             image = drawer.draw_image(*data)
             e_display.update(image)
             redraw_ts = now
 
-        logger.debug(f"Sleeping for {args.timeout} seconds")
-        time.sleep(1)
+        logger.debug(f"Sleeping for {timeout} seconds")
+        time.sleep(timeout)
 
 
 if __name__ == "__main__":

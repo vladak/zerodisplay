@@ -41,3 +41,6 @@ jobs:
         run: |
           pip install isort
           isort **.py  --check --diff
+      - name: Run tests
+        run: |
+          pytest

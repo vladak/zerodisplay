@@ -5,3 +5,4 @@ pillow
 requests
 wheel
 adafruit-circuitpython-minimqtt
+pytest

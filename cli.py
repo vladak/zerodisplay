@@ -32,7 +32,7 @@ class TimeoutAction(argparse.Action):
         setattr(namespace, self.dest, values)
 
 
-def parse_args():
+def parse_args(args=None):
     """
     Parse command line arguments
     """
@@ -121,4 +121,4 @@ def parse_args():
         required=True,
     )
 
-    return parser.parse_args()
+    return parser.parse_args(args)

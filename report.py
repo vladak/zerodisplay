@@ -59,6 +59,7 @@ def main():
         if all(data):
             break
         time.sleep(1)
+    logger.info("Done waiting for the metrics")
     if None in data:
         logger.warning(f"Some metrics are missing: {data}")
 

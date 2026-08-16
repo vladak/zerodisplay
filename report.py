@@ -86,7 +86,7 @@ def main():
 
 def loop(cond, timeout, drawer, e_display, metrics):
     """
-    infinite loop that retrieves the metrics and updates the display.
+    conditional loop that retrieves the metrics and updates the display.
     :param cond: object implementing FormalCondInterface
     :param timeout: timeout in seconds
     :param drawer: MetricsDrawer object
